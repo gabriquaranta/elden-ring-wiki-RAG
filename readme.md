@@ -2,9 +2,9 @@
 
 An AI-powered question-answering system for Elden Ring lore using Retrieval-Augmented Generation (RAG). Ask questions about the game's world, characters, mechanics, and story, and get accurate answers sourced directly from the official wiki.
 
-<img src="screenshots/screenshot1.png" width="400" style="display: inline;"> 
-<img src="screenshots/screenshot2.png" width="400" style="display: inline;"> 
-<img src="screenshots/screenshot3.png" width="400" style="display: inline;">
+<img src="screenshots/screenshot1.png" style="display: inline;"> 
+<img src="screenshots/screenshot2.png" style="display: inline;"> 
+<img src="screenshots/screenshot3.png" style="display: inline;">
 
 ## Features
 
