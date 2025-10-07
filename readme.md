@@ -1,4 +1,4 @@
-Comprehensive, ordered checklist to guide you through building the Elden Ring RAG pipeline from inception to a polished, CV-ready project.
+# Elden Ring Wiki RAG Project Roadmap
 
 ### **Phase 1: Foundational Setup & Data Acquisition**
 
@@ -10,22 +10,22 @@ _The goal of this phase is to establish a solid project structure and gather hig
   - **Action:** Set up a Python virtual environment (`venv` or `conda`).
   - **Tech:** Git, Python
 
-- **[ ] Initial Dependency Installation**
+- **[X] Initial Dependency Installation**
 
   - **Action:** Install core libraries for scraping and data handling.
   - **Tech:** `pip install requests beautifulsoup4 pandas notebook`
 
-- **[ ] Develop Scraping Script**
+- **[X] Develop Scraping Script**
 
   - **Action:** Write a Python script to scrape the text content from all relevant pages of the Elden Ring Fextralife wiki.
   - **Action:** Implement robust logic to handle potential issues like dynamic JavaScript-loaded content (if necessary).
   - **Tech:** `requests`, `BeautifulSoup4`, `Selenium` (if needed)
 
-- **[ ] Cache Raw Data**
+- **[X] Cache Raw Data**
 
   - **Action:** Save the raw, unprocessed HTML of every scraped page into a local directory (`data/raw_html/`). This prevents needing to re-scrape constantly.
 
-- **[ ] Develop Cleaning & Structuring Script**
+- **[X] Develop Cleaning & Structuring Script**
   - **Action:** Write a script that reads the raw HTML files, extracts the primary text content, and removes irrelevant HTML tags, navigation bars, and ads.
   - **Action:** Save the cleaned content in a structured format. A single JSON file containing a list of objects (each with `url`, `title`, and `content` keys) is ideal.
   - **Tech:** `BeautifulSoup4`, `pandas` or Python's `json` library
