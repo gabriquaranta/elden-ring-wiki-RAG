@@ -4,7 +4,6 @@ An AI-powered question-answering system for Elden Ring lore using Retrieval-Augm
 
 <img src="screenshots/screenshot1.png" style="display: inline;"> 
 <img src="screenshots/screenshot2.png" style="display: inline;"> 
-<img src="screenshots/screenshot3.png" style="display: inline;">
 
 ## Features
 
