@@ -1,120 +1,178 @@
-# Elden Ring Wiki RAG Project Roadmap
+# Elden Ring Wiki RAG System
 
-### **Phase 1: Foundational Setup & Data Acquisition**
+An AI-powered question-answering system for Elden Ring lore using Retrieval-Augmented Generation (RAG). Ask questions about the game's world, characters, mechanics, and story, and get accurate answers sourced directly from the official wiki.
 
-_The goal of this phase is to establish a solid project structure and gather high-quality, clean data from the wiki._
+<img src="screenshots/screenshot1.png" width="400" style="display: inline;"> 
+<img src="screenshots/screenshot2.png" width="400" style="display: inline;"> 
+<img src="screenshots/screenshot3.png" width="400" style="display: inline;">
 
-- **[X] Project Initialization**
+## Features
 
-  - **Action:** Create a new Git repository for your project.
-  - **Action:** Set up a Python virtual environment (`venv` or `conda`).
-  - **Tech:** Git, Python
+- **Intelligent Q&A**: Answer complex questions about Elden Ring lore using advanced RAG technology
+- **Source Citations**: Every answer includes references to specific wiki pages with relevance scores
+- **Comprehensive Coverage**: Trained on 93+ wiki pages covering characters, locations, items, mechanics, and story
+- **Fast Responses**: ~2-3 second response times using optimized embeddings and vector search
+- **Web Interface**: Clean, user-friendly Streamlit app for easy interaction
+- **Modular Architecture**: Separate scripts for data processing, indexing, and querying
 
-- **[X] Initial Dependency Installation**
+## Tech Stack
 
-  - **Action:** Install core libraries for scraping and data handling.
-  - **Tech:** `pip install requests beautifulsoup4 pandas notebook`
+### Core Technologies
 
-- **[X] Develop Scraping Script**
+- **Language**: Python 3.13
+- **RAG Framework**: LangChain
+- **LLM**: Google Gemini 2.5 Flash Preview
+- **Embeddings**: Sentence Transformers (all-MiniLM-L6-v2, 384 dimensions)
+- **Vector Database**: Pinecone (cosine similarity)
+- **Web Framework**: Streamlit
 
-  - **Action:** Write a Python script to scrape the text content from all relevant pages of the Elden Ring Fextralife wiki.
-  - **Action:** Implement robust logic to handle potential issues like dynamic JavaScript-loaded content (if necessary).
-  - **Tech:** `requests`, `BeautifulSoup4`, `Selenium` (if needed)
+### Data Processing
 
-- **[X] Cache Raw Data**
+- **Web Scraping**: requests + BeautifulSoup4
+- **Data Handling**: pandas, JSON
+- **Text Chunking**: RecursiveCharacterTextSplitter (1000 chars, 200 overlap)
 
-  - **Action:** Save the raw, unprocessed HTML of every scraped page into a local directory (`data/raw_html/`). This prevents needing to re-scrape constantly.
+### Development Tools
 
-- **[X] Develop Cleaning & Structuring Script**
-  - **Action:** Write a script that reads the raw HTML files, extracts the primary text content, and removes irrelevant HTML tags, navigation bars, and ads.
-  - **Action:** Save the cleaned content in a structured format. A single JSON file containing a list of objects (each with `url`, `title`, and `content` keys) is ideal.
-  - **Tech:** `BeautifulSoup4`, `pandas` or Python's `json` library
+- **Environment**: Python virtual environment (.env/)
+- **Dependencies**: requirements.txt
+- **API Management**: direnv (.envrc)
+- **Version Control**: Git
 
-### **Phase 2: Core RAG Pipeline Implementation**
+## Quick Start
 
-_With clean data in hand, this phase focuses on building the main retrieval and generation engine._
+### Prerequisites
 
-- **[ ] Install Core ML/LLM Libraries**
+- Python 3.13+
+- direnv (for API key management)
 
-  - **Action:** Install the necessary frameworks and libraries for the RAG pipeline.
-  - **Tech:** `pip install langchain openai sentence-transformers` (or `google-generativeai`, etc.)
+### 1. Clone and Setup
 
-- **[ ] Install and Set Up Vector Database**
+```bash
+git clone <repository-url>
+cd elden-ring-wiki-rag
+python -m venv .env
+source .env/bin/activate
+pip install -r requirements.txt
+```
 
-  - **Action:** Choose a vector database, sign up for a free-tier account, and get your API key.
-  - **Action:** Install the specific Python client for your chosen database.
-  - **Tech:** `pip install pinecone-client`, `qdrant-client`, or `weaviate-client`
+### 2. API Keys Setup
 
-- **[ ] Implement Data Loading and Chunking**
+Create a `.envrc` file in the project root:
 
-  - **Action:** Write the script to load your cleaned JSON data.
-  - **Action:** Use your chosen framework (`LangChain` or `LlamaIndex`) to split the documents into smaller, overlapping text chunks.
+```bash
+export PINECONE_API_KEY="your_pinecone_api_key_here"
+export GOOGLE_API_KEY="your_google_gemini_api_key_here"
+```
 
-- **[ ] Implement Embedding and Indexing**
+**Get API Keys:**
 
-  - **Action:** Write the script that performs the following:
-    1.  Initializes the embedding model (e.g., from `sentence-transformers`).
-    2.  Connects to your vector database.
-    3.  Iterates through each text chunk, generates a vector embedding, and uploads the chunk and its embedding to the database. This is a one-time setup process.
+- **Pinecone**: Sign up at [pinecone.io](https://app.pinecone.io/) (free tier available)
+- **Google Gemini**: Get key at [Google AI Studio](https://makersuite.google.com/app/apikey) (free tier available)
 
-- **[ ] Build the RAG Chain**
+### 3. Run the Application
 
-  - **Action:** Create the core logic that:
-    1.  Accepts a user query.
-    2.  Embeds the query using the same sentence-transformer model.
-    3.  Performs a similarity search against the vector database to retrieve the top-K relevant chunks.
-    4.  Injects the retrieved chunks as context into a prompt for an LLM.
-    5.  Calls the LLM API to generate a final answer based on the context.
+```bash
+streamlit run app.py
+```
 
-- **[ ] Test Pipeline in a Notebook**
-  - **Action:** Use a Jupyter Notebook to test the end-to-end pipeline with various questions. Debug and ensure all components are working together correctly.
+## Project Structure
 
-### **Phase 3: Application, Deployment & Documentation**
+```
+├── data/
+│   ├── raw_html/          # Cached scraped wiki pages (92 files)
+│   └── cleaned_data.json  # Processed wiki content (93 pages, 5M+ chars)
+├── scripts/
+│   ├── scrape.py          # Wiki scraping and caching
+│   ├── process.py         # HTML cleaning and JSON structuring
+│   ├── setup_pinecone.py  # Vector database initialization
+│   ├── chunk_data.py      # Text chunking with LangChain
+│   ├── index_data.py      # Embedding generation and Pinecone upload
+│   ├── query_rag.py       # RAG query system and API
+│   └── test_pipeline.py   # Component validation tests
+├── app.py                 # Streamlit web interface
+├── requirements.txt       # Python dependencies (15 packages)
+├── USAGE.md              # Detailed usage guide
+└── readme.md             # This file
+```
 
-_This phase makes your project usable and shareable, turning it into a tangible portfolio piece._
+## Development Steps
 
-- **[ ] Build a User Interface**
+### Data Pipeline
 
-  - **Action:** Create a simple web application to interact with your RAG pipeline.
-  - **Tech:** `Streamlit` or `Gradio` are highly recommended for their speed and simplicity.
+1. **Scraping** (`scripts/scrape.py`): Discover and download wiki pages
+2. **Processing** (`scripts/process.py`): Clean HTML, extract text, structure as JSON
+3. **Chunking** (`scripts/chunk_data.py`): Split text into overlapping chunks
+4. **Indexing** (`scripts/index_data.py`): Generate embeddings, upload to Pinecone
 
-- **[ ] Finalize Dependencies**
+### Query Pipeline
 
-  - **Action:** Generate a `requirements.txt` file that lists all necessary packages for your project to run.
-  - **Tech:** `pip freeze > requirements.txt`
+1. **Embedding** (`query_rag.py`): Convert user query to vector
+2. **Retrieval** (`query_rag.py`): Find top-5 similar chunks in Pinecone
+3. **Generation** (`query_rag.py`): Use Gemini to generate answer with context
 
-- **[ ] Deploy the Application**
+### Testing
 
-  - **Action:** Choose a hosting platform and deploy your app.
-  - **Action:** Ensure you have configured any necessary API keys as environment variables on the platform.
-  - **Tech:** Hugging Face Spaces, Streamlit Community Cloud.
+```bash
+# Test all components
+python scripts/test_pipeline.py
 
-- **[ ] Create Project Documentation**
-  - **Action:** Write a comprehensive `README.md` file in your Git repository. It should include:
-    - A clear project title and a brief description.
-    - The tech stack used.
-    - Instructions on how to set up and run the project locally.
-    - A live link to your deployed application.
+# Individual components
+python scripts/scrape.py      # Scrape wiki pages
+python scripts/process.py     # Clean and structure data
+python scripts/chunk_data.py  # Create text chunks
+python scripts/index_data.py  # Generate embeddings and index
+```
 
-### **Phase 4: Advanced Enhancements (Optional but Recommended)**
+## System Performance
 
-_This final phase elevates your project by tackling more complex challenges, demonstrating a deeper level of skill._
+- **Data Volume**: 93 wiki pages, 5M+ characters of clean text
+- **Chunk Strategy**: 1000-character chunks with 200-character overlap
+- **Embedding Model**: 384-dimensional vectors, cosine similarity
+- **Retrieval**: Top-5 most relevant chunks per query
+- **Response Time**: 2-3 seconds (embedding + search + generation)
+- **Accuracy**: Context-aware answers with source citations
 
-- **[ ] Create an Evaluation Set**
+## Usage Examples
 
-  - **Action:** Manually create a list of 15-20 diverse and challenging questions based on the Elden Ring lore, along with the ideal answers. This will be used to objectively measure improvements.
+The system can answer questions like:
 
-- **[ ] (Advanced) Implement GraphRAG**
+**Character Lore:**
 
-  - **Action:** Write a script to identify key entities (e.g., "Ranni," "Caria Manor") and their relationships from your text data.
-  - **Action:** Use this to construct and save a knowledge graph.
-  - **Action:** Modify your retrieval logic to use the graph to find related context, providing a richer set of information to the LLM.
-  - **Tech:** `spaCy` (for Named Entity Recognition), `NetworkX` (for graph building).
+- "Who is Queen Marika and what is her role in the story?"
+- "Tell me about the relationship between Radagon and Rennala"
 
-- **[ ] Refine and Evaluate**
+**Game Mechanics:**
 
-  - **Action:** Test your advanced GraphRAG system against your evaluation set.
-  - **Action:** Experiment with different prompts, embedding models, or retrieval strategies to see if you can improve the accuracy and quality of the answers.
+- "What are the different types of damage in Elden Ring?"
+- "How do status effects work?"
 
-- **[ ] Final Code Review**
-  - **Action:** Clean up your code, add comments where necessary, and ensure your project structure is logical and easy to understand. Push all final changes to your Git repository.
+**World Exploration:**
+
+- "How do I reach the Mountaintops of the Giants?"
+- "What are the requirements for becoming the Elden Lord?"
+
+**Items & Equipment:**
+
+- "What are the best weapons for a strength build?"
+- "How do I get the Moonlight Greatsword?"
+
+## API Reference
+
+### EldenRingRAG Class
+
+```python
+from scripts.query_rag import EldenRingRAG
+
+rag = EldenRingRAG()
+answer, sources = rag.answer_question("Who is Malenia?")
+```
+
+**Methods:**
+
+- `retrieve_relevant_chunks(query, top_k=5)`: Get relevant text chunks
+- `answer_question(question)`: Get full answer with sources
+
+## License
+
+This project is for educational purposes. Elden Ring content and trademarks belong to FromSoftware Inc. and Bandai Namco Entertainment Inc.

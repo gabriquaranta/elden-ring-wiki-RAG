@@ -1,0 +1,42 @@
+{
+  "total_chunks": 6377,
+  "total_characters": 5776714,
+  "average_chunk_length": 905.8670221107103,
+  "chunk_size": 1000,
+  "chunk_overlap": 200,
+  "sample_chunks": [
+    {
+      "id": "chunk_0",
+      "text": "Search Results\n\nConsumables | Elden Ring Wiki\n\nConsumables\n\nConsumable Tools,\n\nis a category of items often utilized for their immediate or temporary effects during exploration or\n\n. While they can be found while exploring the Lands Between, many\n\nhave adequate supplies, or they can be\n\nby the player. This page covers their names, type, effect, and acquisition.\n\n, craftable consumables are automatically replenished without cost upon the completion of a colosseum battle. Items that are not craftable do not replenish upon the completion of a colosseum battle.\n\nBell Bearings\n\nConsumables\n\nCrafting Mats.\n\nCrystal Tears\n\nGreat Runes\n\nMultiplayer\n\nRemembrances\n\nUpgrade Mats.\n\nElden Ring Consumables\n\nSacred Flasks\n\nSites of Grace\n\n, you can assign uses of, and upgrade, your flasks.\n\nSacred Flasks are upgraded using\n\nGolden Seeds\n\nSacred Tears\n\nGolden Seeds\n\n, picked from ethereal saplings, increase the flask's total number of uses up to 14.\n\nSacred Tears",
+      "metadata": {
+        "url": "https://eldenring.wiki.fextralife.com/Consumables",
+        "title": "Consumables | Elden Ring Wiki",
+        "source": "elden_ring_wiki",
+        "chunk_index": 0,
+        "total_chunks": 117
+      }
+    },
+    {
+      "id": "chunk_1",
+      "text": "Sacred Flasks are upgraded using\n\nGolden Seeds\n\nSacred Tears\n\nGolden Seeds\n\n, picked from ethereal saplings, increase the flask's total number of uses up to 14.\n\nSacred Tears\n\n, found inside many of the land's decayed churches, increase the potency of the flask's restoration up to +12.\n\nFlask of Wondrous Physick\n\nSites of Grace\n\nyou can mix two\n\nCrystal Tears\n\ninside the flask for various special effects.\n\nCrystal Tears\n\ncan be naturally found through exploration, but many are located at the base of Minor Erdtrees.\n\nShadow of the Erdtree Consumables Table\n\nConsumables Table\n\nConsumables Gallery\n\nShadow of the Erdtree Consumables Table\n\nQuick Search of Consumables\n\nRecommended Search Terms:\n\nCookbook (Craftable), Not Craftable,\n\nMedicine, Healing, Damage Negation\n\nGrease, Torrent, Throwing\n\nHefty Fire Pot\n\nThrowing Pot\n\nThrow at enemies to inflict severe fire damage\n\nGreater Potentate's Cookbook [1]\n\nRedflesh Mushroom\n\nBlack Pyrefly\n\nHefty Cracked Pot\n\nHefty Rock Pot\n\nThrowing Pot",
+      "metadata": {
+        "url": "https://eldenring.wiki.fextralife.com/Consumables",
+        "title": "Consumables | Elden Ring Wiki",
+        "source": "elden_ring_wiki",
+        "chunk_index": 1,
+        "total_chunks": 117
+      }
+    },
+    {
+      "id": "chunk_2",
+      "text": "Hefty Fire Pot\n\nThrowing Pot\n\nThrow at enemies to inflict severe fire damage\n\nGreater Potentate's Cookbook [1]\n\nRedflesh Mushroom\n\nBlack Pyrefly\n\nHefty Cracked Pot\n\nHefty Rock Pot\n\nThrowing Pot\n\nThrow at enemies to inflict heavy damage\n\nGreater Potentate's Cookbook [12]\n\nHefty Lightning Pot\n\nThrowing Pot\n\nThrow at enemies to inflict severe lightning damage\n\nGreater Potentate's Cookbook [5]\n\nRedflesh Mushroom\n\nYellow Fulgurbloom\n\nHefty Fetid Pot\n\nThrowing Pot\n\nThrow at enemies to cause a large buildup of deadly poison\n\nGreater Potentate's Cookbook [8]\n\nHorn-Strewn Excrement\n\nHefty Fly Pot\n\nThrowing Pot\n\nThrow at enemies to release a large swarm of bloodflies\n\nGreater Potentate's Cookbook [10]\n\nSanguine Amaryllis\n\nHefty Freezing Pot\n\nThrowing Pot\n\nThrow at enemies to cause a large buildup of frost\n\nGreater Potentate's Cookbook [11]\n\nWhiteflesh Mushroom\n\nFrozen Maggot\n\nHefty Poison Pot\n\nThrowing Pot\n\nThrow at enemies to cause a large buildup of poison\n\nGreater Potentate's Cookbook [7]",
+      "metadata": {
+        "url": "https://eldenring.wiki.fextralife.com/Consumables",
+        "title": "Consumables | Elden Ring Wiki",
+        "source": "elden_ring_wiki",
+        "chunk_index": 2,
+        "total_chunks": 117
+      }
+    }
+  ]
+}
