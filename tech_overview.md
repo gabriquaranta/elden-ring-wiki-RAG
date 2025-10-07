@@ -53,9 +53,11 @@ User Query → Embedding → Retrieval → Generation → Answer
 #### 1. Data Acquisition (`scripts/scrape.py`)
 
 - **Web Scraping**: Uses `requests` and `BeautifulSoup4` to discover and download wiki pages
+  - **Default Mode**: Single-page discovery from main wiki page (fast, creates base dataset with ~90 pages)
+  - **Recursive Mode**: Multi-level crawling up to configurable depth (comprehensive, finds more pages for larger dataset)
 - **Rate Limiting**: Implements respectful delays (1 second) between requests
 - **Caching**: Stores raw HTML in `data/raw_html/` to avoid re-scraping
-- **Discovery**: Automatically finds all relevant wiki pages from the main page and categories
+- **Discovery**: Automatically finds all relevant wiki pages from navigation and internal links
 
 #### 2. Data Processing (`scripts/process.py`)
 

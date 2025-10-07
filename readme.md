@@ -3,16 +3,17 @@
 An AI-powered question-answering system for Elden Ring lore using Retrieval-Augmented Generation (RAG). Ask questions about the game's world, characters, mechanics, and story, and get accurate answers sourced directly from the official wiki.
 
 <img src="screenshots/screenshot1.png" style="display: inline;"> 
-<img src="screenshots/screenshot2.png" style="display: inline;"> 
+<img src="screenshots/screenshot2.png" style="display: inline;">
 
 ## Features
 
 - **Intelligent Q&A**: Answer complex questions about Elden Ring lore using advanced RAG technology
 - **Source Citations**: Every answer includes references to specific wiki pages with relevance scores
-- **Comprehensive Coverage**: Trained on 93+ wiki pages covering characters, locations, items, mechanics, and story
+- **Comprehensive Coverage**: Base dataset of 93+ wiki pages (expandable with recursive crawling for 200+ pages)
 - **Fast Responses**: ~2-3 second response times using optimized embeddings and vector search
 - **Web Interface**: Clean, user-friendly Streamlit app for easy interaction
 - **Modular Architecture**: Separate scripts for data processing, indexing, and querying
+- **Flexible Data Acquisition**: Choose between fast single-page discovery or comprehensive recursive crawling
 
 ## Tech Stack
 
@@ -79,10 +80,10 @@ streamlit run app.py
 
 ```
 ├── data/
-│   ├── raw_html/          # Cached scraped wiki pages (92 files)
-│   └── cleaned_data.json  # Processed wiki content (93 pages, 5M+ chars)
+│   ├── raw_html/          # Cached scraped wiki pages (92 files from base dataset)
+│   └── cleaned_data.json  # Processed wiki content (93 pages, expandable with recursive crawling)
 ├── scripts/
-│   ├── scrape.py          # Wiki scraping and caching
+│   ├── scrape.py          # Wiki scraping (single-page or recursive crawling)
 │   ├── process.py         # HTML cleaning and JSON structuring
 │   ├── setup_pinecone.py  # Vector database initialization
 │   ├── chunk_data.py      # Text chunking with LangChain
@@ -121,6 +122,34 @@ python scripts/scrape.py      # Scrape wiki pages
 python scripts/process.py     # Clean and structure data
 python scripts/chunk_data.py  # Create text chunks
 python scripts/index_data.py  # Generate embeddings and index
+```
+
+## Development
+
+To run individual pipeline components:
+
+```bash
+# Test all components
+python scripts/test_pipeline.py
+
+# Scrape new data (default: single-page discovery - fast, creates base dataset)
+python scripts/scrape.py
+
+# Scrape with recursive crawling (comprehensive - finds more pages for larger dataset)
+python scripts/scrape.py --recursive --depth 3
+
+# Process raw HTML
+python scripts/process.py
+
+# Set up vector database
+python scripts/setup_pinecone.py
+
+# Chunk and index data
+python scripts/chunk_data.py
+python scripts/index_data.py
+
+# Query the system
+python scripts/query_rag.py
 ```
 
 ## System Performance

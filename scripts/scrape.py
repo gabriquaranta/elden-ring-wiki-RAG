@@ -3,6 +3,8 @@
 elden ring wiki scraper
 
 scrapes all relevant pages from the elden ring fextralife wiki and caches raw html.
+
+supports both single-page discovery (fast) and recursive crawling (comprehensive).
 """
 
 import os
@@ -54,6 +56,51 @@ class EldenRingWikiScraper:
             return urls
 
         print(f"found {len(urls)} potential wiki pages")
+        return urls
+
+    def get_page_urls_recursive(self, max_depth=2):
+        """recursively discover all wiki pages up to max_depth."""
+        visited = set()
+        to_visit = {self.base_url}
+        urls = set()
+
+        for depth in range(max_depth):
+            print(f"crawling depth {depth + 1}/{max_depth}...")
+            next_visit = set()
+
+            for url in to_visit:
+                if url in visited:
+                    continue
+
+                try:
+                    response = self.session.get(url)
+                    response.raise_for_status()
+                    soup = BeautifulSoup(response.content, "html.parser")
+
+                    # extract links from this page
+                    for link in soup.find_all("a", href=True):
+                        href = link["href"]
+                        if href.startswith("/"):
+                            full_url = urljoin(url, href)
+                            if (
+                                self._is_wiki_page(full_url)
+                                and full_url not in visited
+                                and full_url not in urls
+                            ):
+                                urls.add(full_url)
+                                if full_url not in visited:
+                                    next_visit.add(full_url)
+
+                    visited.add(url)
+                    time.sleep(self.delay)
+
+                except Exception as e:
+                    print(f"error crawling {url}: {e}")
+
+            to_visit = next_visit
+            print(f"depth {depth + 1}: found {len(urls)} pages so far")
+
+        print(f"recursive crawling complete! found {len(urls)} wiki pages")
         return urls
 
     def _is_wiki_page(self, url):
@@ -108,9 +155,13 @@ class EldenRingWikiScraper:
         )
         return f"{safe_name}.html"
 
-    def scrape_all_pages(self):
+    def scrape_all_pages(self, recursive=False, max_depth=2):
         """scrape all discovered wiki pages."""
-        urls = self.get_page_urls()
+        if recursive:
+            urls = self.get_page_urls_recursive(max_depth)
+        else:
+            urls = self.get_page_urls()
+
         scraped_data = []
 
         for i, url in enumerate(urls, 1):
@@ -136,8 +187,31 @@ class EldenRingWikiScraper:
 
 
 def main():
+    import argparse
+
+    parser = argparse.ArgumentParser(description="scrape elden ring wiki pages")
+    parser.add_argument(
+        "--recursive",
+        action="store_true",
+        help="use recursive crawling to find more pages",
+    )
+    parser.add_argument(
+        "--depth",
+        type=int,
+        default=2,
+        help="maximum crawl depth for recursive mode (default: 2)",
+    )
+
+    args = parser.parse_args()
+
     scraper = EldenRingWikiScraper()
-    scraper.scrape_all_pages()
+
+    if args.recursive:
+        print(f"starting recursive crawl with max depth {args.depth}...")
+        scraper.scrape_all_pages(recursive=True, max_depth=args.depth)
+    else:
+        print("starting single-page discovery...")
+        scraper.scrape_all_pages(recursive=False)
 
 
 if __name__ == "__main__":
