@@ -142,26 +142,6 @@ User Query → Embedding → Retrieval → Generation → Answer
 - **Content Filtering**: Removes boilerplate while preserving lore content
 - **Quality Assurance**: Multiple fallback strategies for content extraction
 
-## 🚀 Use Cases & Applications
-
-### For Players
-
-- **Lore Research**: Deep dive into character backstories and world history
-- **Mechanic Clarification**: Understand complex game systems and interactions
-- **Story Analysis**: Connect plot points across the vast game narrative
-
-### For Content Creators
-
-- **Fact Checking**: Verify lore accuracy for guides and videos
-- **Research Support**: Quickly gather information for content creation
-- **Educational Content**: Build accurate lore explanations and theories
-
-### For Developers
-
-- **RAG Implementation**: Reference architecture for similar projects
-- **AI Integration**: Example of combining embeddings, vector search, and LLMs
-- **Data Processing**: Template for web scraping and text processing pipelines
-
 ## 🔧 Development Workflow
 
 ### Local Development
@@ -178,22 +158,6 @@ User Query → Embedding → Retrieval → Generation → Answer
 - **Scalability**: Pinecone handles increased query loads automatically
 - **Cost Optimization**: Efficient chunking and retrieval strategies
 - **Monitoring**: Track query performance and accuracy metrics
-
-## 🎖️ Quality Assurance
-
-### Testing Strategy
-
-- **Component Validation**: Individual script testing with `test_pipeline.py`
-- **Integration Testing**: End-to-end pipeline verification
-- **API Validation**: Real-time checking of Pinecone and Gemini connectivity
-- **Data Integrity**: Checksums and validation of processed content
-
-### Accuracy Measures
-
-- **Source Verification**: All answers cite specific wiki pages
-- **Relevance Scoring**: Cosine similarity scores for retrieval quality
-- **Context Completeness**: Multiple chunks provide comprehensive answers
-- **Factual Consistency**: LLM generates based on verified wiki content
 
 ## 🔮 Future Enhancements
 
