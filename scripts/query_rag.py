@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-RAG Query Chain
+rag query chain
 
-Build and run the RAG pipeline for answering Elden Ring lore questions.
+build and run the rag pipeline for answering elden ring lore questions.
 """
 
 import os
@@ -17,22 +17,22 @@ from langchain.schema.runnable import RunnablePassthrough
 
 class EldenRingRAG:
     def __init__(self):
-        # Initialize embedding model
+        # initialize embedding model
         self.embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
 
-        # Initialize Pinecone
+        # initialize pinecone
         api_key = os.getenv("PINECONE_API_KEY")
         if not api_key:
-            raise ValueError("PINECONE_API_KEY environment variable not set!")
+            raise ValueError("pinecone_api_key environment variable not set!")
 
         self.pc = Pinecone(api_key=api_key)
         self.index_name = "elden-ring-wiki-rag"
         self.index = self.pc.Index(self.index_name)
 
-        # Initialize Gemini LLM
+        # initialize gemini llm
         google_api_key = os.getenv("GOOGLE_API_KEY")
         if not google_api_key:
-            raise ValueError("GOOGLE_API_KEY environment variable not set!")
+            raise ValueError("google_api_key environment variable not set!")
 
         self.llm = ChatGoogleGenerativeAI(
             model="gemini-2.0-flash-exp",
@@ -41,37 +41,37 @@ class EldenRingRAG:
             max_tokens=1024,
         )
 
-        # Set up the RAG prompt template
+        # set up the rag prompt template
         self.prompt_template = PromptTemplate(
             input_variables=["context", "question"],
-            template="""You are an expert on Elden Ring lore. Use the following context from the Elden Ring wiki to answer the user's question accurately and helpfully.
+            template="""you are an expert on elden ring lore. use the following context from the elden ring wiki to answer the user's question accurately and helpfully.
 
-Context from Elden Ring Wiki:
+context from elden ring wiki:
 {context}
 
-Question: {question}
+question: {question}
 
-Instructions:
-- Answer based primarily on the provided context
-- Be accurate and detailed but concise
-- If the context doesn't contain enough information, say so clearly
-- Include relevant quotes from the context when helpful
-- Maintain an engaging, helpful tone
+instructions:
+- answer based primarily on the provided context
+- be accurate and detailed but concise
+- if the context doesn't contain enough information, say so clearly
+- include relevant quotes from the context when helpful
+- maintain an engaging, helpful tone
 
-Answer:""",
+answer:""",
         )
 
     def retrieve_relevant_chunks(self, query, top_k=5):
-        """Retrieve the most relevant text chunks for a query."""
-        # Generate embedding for the query
+        """retrieve the most relevant text chunks for a query."""
+        # generate embedding for the query
         query_embedding = self.embedding_model.encode([query])[0]
 
-        # Search Pinecone
+        # search pinecone
         results = self.index.query(
             vector=query_embedding.tolist(), top_k=top_k, include_metadata=True
         )
 
-        # Extract text chunks from results
+        # extract text chunks from results
         chunks = []
         for match in results["matches"]:
             chunk_text = match["metadata"]["text"]
@@ -87,28 +87,28 @@ Answer:""",
         return chunks
 
     def format_context(self, chunks):
-        """Format retrieved chunks into context string."""
+        """format retrieved chunks into context string."""
         context_parts = []
         for i, chunk in enumerate(chunks, 1):
-            context_parts.append(f"[Source {i}] {chunk['title']}\n{chunk['text']}")
+            context_parts.append(f"[source {i}] {chunk['title']}\n{chunk['text']}")
 
         return "\n\n".join(context_parts)
 
     def answer_question(self, question):
-        """Answer a question using the RAG pipeline."""
-        print(f"🔍 Searching for: {question}")
+        """answer a question using the rag pipeline."""
+        print(f"[search] searching for: {question}")
 
-        # Retrieve relevant chunks
+        # retrieve relevant chunks
         chunks = self.retrieve_relevant_chunks(question)
-        print(f"📚 Found {len(chunks)} relevant chunks")
+        print(f"[books] found {len(chunks)} relevant chunks")
 
         if not chunks:
-            return "I couldn't find any relevant information in the Elden Ring wiki for this question."
+            return "i couldn't find any relevant information in the elden ring wiki for this question."
 
-        # Format context
+        # format context
         context = self.format_context(chunks)
 
-        # Create the chain
+        # create the chain
         chain = (
             {"context": lambda x: context, "question": RunnablePassthrough()}
             | self.prompt_template
@@ -116,36 +116,36 @@ Answer:""",
             | StrOutputParser()
         )
 
-        # Generate answer
-        print("🤖 Generating answer...")
+        # generate answer
+        print("[ai] generating answer...")
         answer = chain.invoke(question)
 
         return answer, chunks
 
 
 def main():
-    # Example usage
+    # example usage
     rag = EldenRingRAG()
 
-    # Test questions
+    # test questions
     test_questions = [
-        "Who is Queen Marika?",
-        "What are the different types of damage in Elden Ring?",
-        "How do I get to the Mountaintops of the Giants?",
-        "What are the requirements for becoming the Elden Lord?",
+        "who is queen marika?",
+        "what are the different types of damage in elden ring?",
+        "how do i get to the mountaintops of the giants?",
+        "what are the requirements for becoming the elden lord?",
     ]
 
-    print("🗡️ Elden Ring Lore Assistant")
+    print("[sword] elden ring lore assistant")
     print("=" * 50)
 
     for question in test_questions:
-        print(f"\n❓ {question}")
+        print(f"\n[q] {question}")
         try:
             answer, chunks = rag.answer_question(question)
-            print(f"💬 {answer}")
-            print(f"📄 Sources: {len(chunks)} chunks")
+            print(f"[answer] {answer}")
+            print(f"[pages] sources: {len(chunks)} chunks")
         except Exception as e:
-            print(f"❌ Error: {e}")
+            print(f"[error] error: {e}")
 
         print("-" * 50)
 

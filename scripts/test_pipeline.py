@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Test RAG Pipeline Components
+test rag pipeline components
 
-Validate individual components of the RAG pipeline without API keys.
+validate individual components of the rag pipeline without api keys.
 """
 
 import json
@@ -11,35 +11,35 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 
 def test_data_loading():
-    """Test loading cleaned data."""
+    """test loading cleaned data."""
     data_path = Path("data/cleaned_data.json")
     if not data_path.exists():
-        print("❌ cleaned_data.json not found")
+        print("[fail] cleaned_data.json not found")
         return False
 
     with open(data_path, "r", encoding="utf-8") as f:
         data = json.load(f)
 
-    print(f"✅ Loaded {len(data)} pages from cleaned data")
+    print(f"[ok] loaded {len(data)} pages from cleaned data")
     return True
 
 
 def test_chunking():
-    """Test text chunking logic."""
-    # Load sample data
+    """test text chunking logic."""
+    # load sample data
     data_path = Path("data/cleaned_data.json")
     if not data_path.exists():
-        print("❌ Cannot test chunking - no cleaned data")
+        print("[fail] cannot test chunking - no cleaned data")
         return False
 
     with open(data_path, "r", encoding="utf-8") as f:
         data = json.load(f)
 
-    # Take first page for testing
+    # take first page for testing
     sample_page = data[0]
     text = sample_page["content"]
 
-    # Initialize text splitter
+    # initialize text splitter
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=1000,
         chunk_overlap=200,
@@ -47,86 +47,86 @@ def test_chunking():
         separators=["\n\n", "\n", ". ", " ", ""],
     )
 
-    # Split text
+    # split text
     chunks = text_splitter.split_text(text)
 
-    print(f"✅ Chunked '{sample_page['title']}' into {len(chunks)} chunks")
+    print(f"[ok] chunked '{sample_page['title']}' into {len(chunks)} chunks")
     print(
-        f"   Average chunk size: {sum(len(c) for c in chunks) / len(chunks):.0f} chars"
+        f"   average chunk size: {sum(len(c) for c in chunks) / len(chunks):.0f} chars"
     )
 
     return True
 
 
 def test_imports():
-    """Test that all required packages can be imported."""
+    """test that all required packages can be imported."""
     try:
         import sentence_transformers
 
-        print("✅ sentence_transformers imported")
+        print("[ok] sentence_transformers imported")
     except ImportError:
-        print("❌ sentence_transformers not available")
+        print("[fail] sentence_transformers not available")
         return False
 
     try:
         import pinecone
 
-        print("✅ pinecone imported")
+        print("[ok] pinecone imported")
     except ImportError:
-        print("❌ pinecone not available")
+        print("[fail] pinecone not available")
         return False
 
     try:
         from langchain_google_genai import ChatGoogleGenerativeAI
 
-        print("✅ langchain_google_genai imported")
+        print("[ok] langchain_google_genai imported")
     except ImportError:
-        print("❌ langchain_google_genai not available")
+        print("[fail] langchain_google_genai not available")
         return False
 
     try:
         from langchain.text_splitter import RecursiveCharacterTextSplitter
 
-        print("✅ langchain imported")
+        print("[ok] langchain imported")
     except ImportError:
-        print("❌ langchain not available")
+        print("[fail] langchain not available")
         return False
 
     return True
 
 
 def test_api_keys():
-    """Test that API keys are set and valid."""
+    """test that api keys are set and valid."""
     import os
 
-    # Test Pinecone API key
+    # test pinecone api key
     pinecone_valid = False
     try:
         api_key = os.getenv("PINECONE_API_KEY")
         if not api_key:
-            raise ValueError("PINECONE_API_KEY environment variable not set")
+            raise ValueError("pinecone_api_key environment variable not set")
 
         import pinecone
 
         pc = pinecone.Pinecone(api_key=api_key)
         index_name = "elden-ring-wiki-rag"
 
-        # Check if index exists
+        # check if index exists
         if index_name in pc.list_indexes().names():
-            print("✅ Pinecone API key valid and index exists")
+            print("[ok] pinecone api key valid and index exists")
             pinecone_valid = True
         else:
-            print("⚠️  Pinecone API key valid but index not found")
-            pinecone_valid = True  # Key is valid, just no index yet
+            print("[warn] pinecone api key valid but index not found")
+            pinecone_valid = True  # key is valid, just no index yet
     except Exception as e:
-        print(f"❌ Pinecone API key invalid: {e}")
+        print(f"[fail] pinecone api key invalid: {e}")
 
-    # Test Google API key
+    # test google api key
     google_valid = False
     try:
         google_api_key = os.getenv("GOOGLE_API_KEY")
         if not google_api_key:
-            raise ValueError("GOOGLE_API_KEY environment variable not set")
+            raise ValueError("google_api_key environment variable not set")
 
         from langchain_google_genai import ChatGoogleGenerativeAI
 
@@ -137,47 +137,47 @@ def test_api_keys():
             max_tokens=10,
         )
 
-        # Try a simple API call
-        response = llm.invoke("Hello")
-        print("✅ Google API key valid")
+        # try a simple api call
+        response = llm.invoke("hello")
+        print("[ok] google api key valid")
         google_valid = True
     except Exception as e:
-        print(f"❌ Google API key invalid: {e}")
+        print(f"[fail] google api key invalid: {e}")
 
     return pinecone_valid and google_valid
 
 
 def main():
-    print("🧪 Testing RAG Pipeline Components")
+    print("[lab] testing rag pipeline components")
     print("=" * 50)
 
     tests = [
-        ("Package Imports", test_imports),
-        ("Data Loading", test_data_loading),
-        ("Text Chunking", test_chunking),
-        ("API Keys", test_api_keys),
+        ("package imports", test_imports),
+        ("data loading", test_data_loading),
+        ("text chunking", test_chunking),
+        ("api keys", test_api_keys),
     ]
 
     passed = 0
     total = len(tests)
 
     for test_name, test_func in tests:
-        print(f"\n🔍 Testing {test_name}...")
+        print(f"\n[test] testing {test_name}...")
         try:
             if test_func():
                 passed += 1
-                print(f"✅ {test_name} passed")
+                print(f"[ok] {test_name} passed")
             else:
-                print(f"❌ {test_name} failed")
+                print(f"[fail] {test_name} failed")
         except Exception as e:
-            print(f"❌ {test_name} failed with error: {e}")
+            print(f"[fail] {test_name} failed with error: {e}")
 
-    print(f"\n📊 Test Results: {passed}/{total} passed")
+    print(f"\n[stats] test results: {passed}/{total} passed")
 
     if passed == total:
-        print("🎉 All components ready! The full pipeline is ready to run.")
+        print("[success] all components ready! the full pipeline is ready to run.")
     else:
-        print("⚠️  Some components need attention before proceeding.")
+        print("[warn] some components need attention before proceeding.")
 
 
 if __name__ == "__main__":

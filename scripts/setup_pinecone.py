@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Pinecone Vector Database Setup
+pinecone vector database setup
 
-Initialize Pinecone client and create index for Elden Ring RAG.
+initialize pinecone client and create index for elden ring rag.
 """
 
 import os
@@ -12,10 +12,10 @@ import time
 
 
 def setup_pinecone():
-    """Set up Pinecone index for the RAG system."""
+    """set up pinecone index for the rag system."""
 
-    # initialize Pinecone client
-    # try to read pinecone key from ./api-keys.txt (format: PINECONE=<apikey>), fall back to env var
+    # initialize pinecone client
+    # try to read pinecone key from ./api-keys.txt (format: pinecone=<apikey>), fall back to env var
     api_key = None
     try:
         keys_path = os.path.join(os.getcwd(), "api-keys.txt")
@@ -41,27 +41,27 @@ def setup_pinecone():
         api_key = os.getenv("PINECONE_API_KEY")
 
     if not api_key:
-        print("Error: PINECONE_API_KEY environment variable not set!")
-        print("Please set your Pinecone API key:")
-        print("export PINECONE_API_KEY='your-api-key-here'")
+        print("error: pinecone_api_key environment variable not set!")
+        print("please set your pinecone api key:")
+        print("export pinecone_api_key='your-api-key-here'")
         return None
 
     pc = Pinecone(api_key=api_key)
 
-    # Define index name and configuration
+    # define index name and configuration
     index_name = "elden-ring-wiki-rag"
-    dimension = 384  # Dimension for 'all-MiniLM-L6-v2' embeddings
+    dimension = 384  # dimension for 'all-minilm-l6-v2' embeddings
     metric = "cosine"
 
-    # Check if index already exists
+    # check if index already exists
     if index_name in pc.list_indexes().names():
-        print(f"Index '{index_name}' already exists.")
+        print(f"index '{index_name}' already exists.")
         index = pc.Index(index_name)
-        print(f"Index stats: {index.describe_index_stats()}")
+        print(f"index stats: {index.describe_index_stats()}")
         return index
 
-    # Create new index
-    print(f"Creating new index: {index_name}")
+    # create new index
+    print(f"creating new index: {index_name}")
     pc.create_index(
         name=index_name,
         dimension=dimension,
@@ -69,32 +69,32 @@ def setup_pinecone():
         spec=ServerlessSpec(cloud="aws", region="us-east-1"),
     )
 
-    # Wait for index to be ready
-    print("Waiting for index to be ready...")
+    # wait for index to be ready
+    print("waiting for index to be ready...")
     while not pc.describe_index(index_name).status["ready"]:
         time.sleep(1)
 
-    print(f"Index '{index_name}' created successfully!")
+    print(f"index '{index_name}' created successfully!")
     index = pc.Index(index_name)
     return index
 
 
 def test_pinecone_connection():
-    """Test the Pinecone connection and index."""
+    """test the pinecone connection and index."""
     try:
         index = setup_pinecone()
         if index:
-            # Test with a simple query
-            test_vector = [0.1] * 384  # Dummy vector for testing
+            # test with a simple query
+            test_vector = [0.1] * 384  # dummy vector for testing
             results = index.query(vector=test_vector, top_k=1, include_metadata=True)
-            print("Pinecone connection test successful!")
-            print(f"Index contains {results.total_vector_count} vectors")
+            print("pinecone connection test successful!")
+            print(f"index contains {results.total_vector_count} vectors")
             return True
     except Exception as e:
-        print(f"Pinecone connection test failed: {e}")
+        print(f"pinecone connection test failed: {e}")
         return False
 
 
 if __name__ == "__main__":
-    print("Setting up Pinecone for Elden Ring Wiki RAG...")
+    print("setting up pinecone for elden ring wiki rag...")
     test_pinecone_connection()

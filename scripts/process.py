@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Elden Ring Wiki Data Processor
+elden ring wiki data processor
 
-Reads raw HTML files, extracts clean text content, and structures it as JSON.
+reads raw html files, extracts clean text content, and structures it as json.
 """
 
 import json
@@ -18,13 +18,13 @@ class EldenRingWikiProcessor:
         self.cleaned_data_file = self.data_dir / "cleaned_data.json"
 
     def load_metadata(self):
-        """Load scraping metadata to get list of pages."""
+        """load scraping metadata to get list of pages."""
         metadata_file = self.data_dir / "scraping_metadata.json"
         with open(metadata_file, "r", encoding="utf-8") as f:
             return json.load(f)
 
     def clean_html_content(self, html_content, url):
-        """Extract clean text content from HTML, removing navigation, ads, etc."""
+        """extract clean text content from html, removing navigation, ads, etc."""
         soup = BeautifulSoup(html_content, "html.parser")
 
         # remove script and style elements
@@ -73,7 +73,7 @@ class EldenRingWikiProcessor:
         return {"url": url, "title": title, "content": text_content}
 
     def _find_content_area(self, soup):
-        """Find the main content area using multiple strategies."""
+        """find the main content area using multiple strategies."""
         # strategy 1: common content containers
         content_selectors = [
             "main",
@@ -94,11 +94,11 @@ class EldenRingWikiProcessor:
             if content and len(content.get_text(strip=True)) > 200:
                 return content
 
-        # strat 2: largest text block
+        # strategy 2: largest text block
         all_text_blocks = []
         for element in soup.find_all(["div", "section", "article", "p"]):
             text = element.get_text(strip=True)
-            if len(text) > 100:  # Only consider substantial text blocks
+            if len(text) > 100:  # only consider substantial text blocks
                 all_text_blocks.append((element, len(text)))
 
         if all_text_blocks:
@@ -106,7 +106,7 @@ class EldenRingWikiProcessor:
             all_text_blocks.sort(key=lambda x: x[1], reverse=True)
             return all_text_blocks[0][0]
 
-        # strat 3: body with some cleaning
+        # strategy 3: body with some cleaning
         body = soup.find("body")
         if body:
             # obvious non-content
@@ -119,7 +119,7 @@ class EldenRingWikiProcessor:
         return soup  # ultimate fallback
 
     def extract_title(self, soup, url):
-        """Extract the page title."""
+        """extract the page title."""
         # different title sources
         title_sources = [
             lambda: soup.find("h1").get_text().strip() if soup.find("h1") else None,
@@ -141,12 +141,12 @@ class EldenRingWikiProcessor:
             except:
                 continue
 
-        # fallback extract from URL
+        # fallback extract from url
         url_path = url.split("/")[-1].replace("+", " ")
         return url_path
 
     def extract_text_content(self, element):
-        """Extract clean text content from HTML element."""
+        """extract clean text content from html element."""
         # get text while preserving some structure
         text = element.get_text(separator="\n", strip=True)
 
@@ -162,20 +162,20 @@ class EldenRingWikiProcessor:
         return "\n\n".join(lines)
 
     def process_all_pages(self):
-        """Process all scraped pages and create cleaned dataset."""
+        """process all scraped pages and create cleaned dataset."""
         metadata = self.load_metadata()
         cleaned_data = []
 
-        print(f"Processing {len(metadata)} pages...")
+        print(f"processing {len(metadata)} pages...")
 
         for i, page_info in enumerate(metadata, 1):
             filename = page_info["filename"]
             url = page_info["url"]
 
-            print(f"[{i}/{len(metadata)}] Processing: {filename}")
+            print(f"[{i}/{len(metadata)}] processing: {filename}")
 
             try:
-                # read raw HTML
+                # read raw html
                 html_file = self.raw_html_dir / filename
                 with open(html_file, "r", encoding="utf-8") as f:
                     html_content = f.read()
@@ -185,7 +185,7 @@ class EldenRingWikiProcessor:
                 cleaned_data.append(cleaned_page)
 
             except Exception as e:
-                print(f"Error processing {filename}: {e}")
+                print(f"error processing {filename}: {e}")
                 continue
 
         # save cleaned data
@@ -193,7 +193,7 @@ class EldenRingWikiProcessor:
             json.dump(cleaned_data, f, indent=2, ensure_ascii=False)
 
         print(
-            f"Processing complete! Saved {len(cleaned_data)} cleaned pages to {self.cleaned_data_file}"
+            f"processing complete! saved {len(cleaned_data)} cleaned pages to {self.cleaned_data_file}"
         )
 
         # create a summary
@@ -202,7 +202,7 @@ class EldenRingWikiProcessor:
         return cleaned_data
 
     def create_summary(self, cleaned_data):
-        """Create a summary of the cleaned dataset."""
+        """create a summary of the cleaned dataset."""
         summary = {
             "total_pages": len(cleaned_data),
             "total_content_length": sum(len(page["content"]) for page in cleaned_data),
@@ -220,7 +220,7 @@ class EldenRingWikiProcessor:
         with open(summary_file, "w", encoding="utf-8") as f:
             json.dump(summary, f, indent=2, ensure_ascii=False)
 
-        print(f"Summary saved to {summary_file}")
+        print(f"summary saved to {summary_file}")
 
 
 def main():

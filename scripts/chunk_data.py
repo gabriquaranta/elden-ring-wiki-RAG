@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Data Loading and Chunking Script
+data loading and chunking script
 
-Load cleaned wiki data and split into overlapping text chunks for embedding.
+load cleaned wiki data and split into overlapping text chunks for embedding.
 """
 
 import json
@@ -18,7 +18,7 @@ class EldenRingDataLoader:
         self.cleaned_data_file = self.data_dir / "cleaned_data.json"
         self.chunks_file = self.data_dir / "text_chunks.json"
 
-        # Configure text splitter
+        # configure text splitter
         self.text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=1000,  # 1000 characters per chunk
             chunk_overlap=200,  # 200 character overlap
@@ -27,18 +27,18 @@ class EldenRingDataLoader:
         )
 
     def load_cleaned_data(self):
-        """Load the cleaned wiki data from JSON file."""
-        print("Loading cleaned data...")
+        """load the cleaned wiki data from json file."""
+        print("loading cleaned data...")
         with open(self.cleaned_data_file, "r", encoding="utf-8") as f:
             data = json.load(f)
-        print(f"Loaded {len(data)} pages")
+        print(f"loaded {len(data)} pages")
         return data
 
     def create_documents(self, data):
-        """Convert cleaned data to LangChain Document objects."""
+        """convert cleaned data to langchain document objects."""
         documents = []
         for page in data:
-            # Create a document for each page
+            # create a document for each page
             doc = Document(
                 page_content=page["content"],
                 metadata={
@@ -49,18 +49,18 @@ class EldenRingDataLoader:
             )
             documents.append(doc)
 
-        print(f"Created {len(documents)} document objects")
+        print(f"created {len(documents)} document objects")
         return documents
 
     def split_into_chunks(self, documents):
-        """Split documents into overlapping text chunks."""
-        print("Splitting documents into chunks...")
+        """split documents into overlapping text chunks."""
+        print("splitting documents into chunks...")
 
         all_chunks = []
         chunk_id = 0
 
         for doc in documents:
-            # Split this document into chunks
+            # split this document into chunks
             chunks = self.text_splitter.split_text(doc.page_content)
 
             for i, chunk_text in enumerate(chunks):
@@ -76,19 +76,19 @@ class EldenRingDataLoader:
                 all_chunks.append(chunk_data)
                 chunk_id += 1
 
-        print(f"Created {len(all_chunks)} text chunks")
+        print(f"created {len(all_chunks)} text chunks")
         return all_chunks
 
     def save_chunks(self, chunks):
-        """Save the text chunks to a JSON file."""
-        print(f"Saving chunks to {self.chunks_file}...")
+        """save the text chunks to a json file."""
+        print(f"saving chunks to {self.chunks_file}...")
         with open(self.chunks_file, "w", encoding="utf-8") as f:
             json.dump(chunks, f, indent=2, ensure_ascii=False)
 
-        print("Chunks saved successfully!")
+        print("chunks saved successfully!")
 
     def create_chunk_summary(self, chunks):
-        """Create a summary of the chunking process."""
+        """create a summary of the chunking process."""
         summary = {
             "total_chunks": len(chunks),
             "total_characters": sum(len(chunk["text"]) for chunk in chunks),
@@ -106,23 +106,23 @@ class EldenRingDataLoader:
         with open(summary_file, "w", encoding="utf-8") as f:
             json.dump(summary, f, indent=2, ensure_ascii=False)
 
-        print(f"Summary saved to {summary_file}")
+        print(f"summary saved to {summary_file}")
 
     def process_all_data(self):
-        """Run the complete data loading and chunking pipeline."""
-        # Load cleaned data
+        """run the complete data loading and chunking pipeline."""
+        # load cleaned data
         data = self.load_cleaned_data()
 
-        # Create documents
+        # create documents
         documents = self.create_documents(data)
 
-        # Split into chunks
+        # split into chunks
         chunks = self.split_into_chunks(documents)
 
-        # Save chunks
+        # save chunks
         self.save_chunks(chunks)
 
-        # Create summary
+        # create summary
         self.create_chunk_summary(chunks)
 
         return chunks
@@ -132,7 +132,7 @@ def main():
     loader = EldenRingDataLoader()
     chunks = loader.process_all_data()
     print(
-        f"\nData processing complete! Created {len(chunks)} chunks ready for embedding."
+        f"\ndata processing complete! created {len(chunks)} chunks ready for embedding."
     )
 
 
