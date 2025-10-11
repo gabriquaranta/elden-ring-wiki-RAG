@@ -164,49 +164,6 @@ python scripts/index_data.py
 python scripts/query_rag.py
 ```
 
-## System Performance
-
-- **Data Volume**: 93 wiki pages, 5M+ characters of clean text
-- **Chunk Strategy**: 1000-character chunks with 200-character overlap
-- **Embedding Model**: 384-dimensional vectors, cosine similarity
-- **Retrieval**: Top-5 most relevant chunks per query
-- **Response Time**: 2-3 seconds (embedding + search + generation)
-- **Accuracy**: Context-aware answers with source citations
-
-## Usage Examples
-
-The system can answer questions like:
-
-**Character Lore:**
-
-- "Who is Queen Marika and what is her role in the story?"
-- "Tell me about the relationship between Radagon and Rennala"
-
-**Game Mechanics:**
-
-- "What are the different types of damage in Elden Ring?"
-- "How do status effects work?"
-
-**World Exploration:**
-
-- "How do I reach the Mountaintops of the Giants?"
-- "What are the requirements for becoming the Elden Lord?"
-
-**Items & Equipment:**
-
-- "What are the best weapons for a strength build?"
-- "How do I get the Moonlight Greatsword?"
-
-## API Reference
-
-### EldenRingRAG Class
-
-```python
-from scripts.query_rag import EldenRingRAG
-
-rag = EldenRingRAG()
-answer, sources, history = rag.answer_question("Who is Malenia?")
-```
 
 **Methods:**
 
