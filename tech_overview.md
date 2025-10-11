@@ -100,6 +100,22 @@ User Query → Embedding → Retrieval → Generation → Answer
 - **Prompt Engineering**: Uses structured prompts for accurate, contextual responses
 - **Source Citation**: Requires the model to cite specific sources and relevance scores
 
+### Conversational / Multi-turn Support
+
+- The RAG pipeline now supports multi-turn conversations. A formatted `history` (list of `{user, assistant}` turns) is injected into the prompt so the model can resolve references and follow-up questions.
+- Implementation details:
+  - `EldenRingRAG.answer_question(question, history=None)` accepts an optional `history` list and returns `(answer, chunks, history)` with the appended turn.
+  - History is formatted into the prompt via `format_history()` and only the most recent `history_max_turns` (default 6) are kept to control token usage.
+  - The Streamlit app stores history in `st.session_state.history` and shows a simple turn-by-turn view; a "Clear conversation" action resets the history.
+
+### Recommendation: Question Rewriting for Better Retrieval
+
+- To improve retrieval relevance for follow-ups, insert a small question-rewriting step:
+  1. Provide the follow-up + last few turns to the LLM with an instruction to rewrite into a standalone question.
+  2. Embed the rewritten question and use that embedding for Pinecone retrieval.
+
+This often produces more accurate retrieval results for context-dependent follow-ups.
+
 ## 📊 Performance Characteristics
 
 ### Data Scale
@@ -176,5 +192,3 @@ User Query → Embedding → Retrieval → Generation → Answer
 - **Query Optimization**: Advanced retrieval strategies and re-ranking
 - **Caching Layer**: Reduce API costs for frequently asked questions
 - **Multi-language**: Support for international wiki translations
-
-

@@ -111,6 +111,18 @@ streamlit run app.py
 2. **Retrieval** (`query_rag.py`): Find top-5 similar chunks in Pinecone
 3. **Generation** (`query_rag.py`): Use Gemini to generate answer with context
 
+### Multi-turn / Conversational Behavior
+
+- The system now supports multi-turn conversations. The RAG prompt accepts a formatted conversation `history` (user/assistant turns) so follow-up questions can reference prior context.
+- `EldenRingRAG.answer_question(question, history=None)` now returns `(answer, chunks, history)` where `history` is an updated list of turns. This is used by both the terminal REPL and the Streamlit app to maintain conversational state.
+- Streamlit UI persists the conversation in `st.session_state.history` and displays the turn-by-turn chat. There's a "Clear conversation" button to reset history.
+- History is truncated to a configurable number of recent turns (default: 6) to avoid hitting token limits.
+
+Notes & recommendations:
+
+- For more robust follow-ups, add a short "question rewriting" step that rewrites follow-ups into standalone queries before retrieval (improves retrieval relevance).
+- Consider persisting history to disk (JSON) or summarizing older turns when conversations grow long.
+
 ### Testing
 
 ```bash
@@ -193,13 +205,14 @@ The system can answer questions like:
 from scripts.query_rag import EldenRingRAG
 
 rag = EldenRingRAG()
-answer, sources = rag.answer_question("Who is Malenia?")
+answer, sources, history = rag.answer_question("Who is Malenia?")
 ```
 
 **Methods:**
 
 - `retrieve_relevant_chunks(query, top_k=5)`: Get relevant text chunks
 - `answer_question(question)`: Get full answer with sources
+- `answer_question(question, history=None)`: Get full answer with sources and conversational history. Returns `(answer, sources, history)`.
 
 ## License
 
