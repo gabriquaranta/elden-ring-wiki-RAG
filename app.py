@@ -14,17 +14,12 @@ import sys
 
 sys.path.append(str(Path(__file__).parent / "scripts"))
 
-# import our rag system (this will fail if api keys aren't set)
-try:
-    from query_rag import EldenRingRAG
-
-    rag_system = EldenRingRAG()
-except Exception as e:
-    st.error(f"failed to initialize rag system: {e}")
-    rag_system = None
+# do not initialize the RAG system at import time (it may perform network IO)
+rag_system = None
 
 
 def main():
+    global rag_system
     st.set_page_config(
         page_title="🗡️ Elden Ring Lore Assistant",
         page_icon="⚔️",
@@ -33,6 +28,10 @@ def main():
 
     st.title("🗡️ Elden Ring Lore Assistant")
     st.markdown("*powered by RAG and Google Gemini*")
+
+    # initialize conversation history in session state
+    if "history" not in st.session_state:
+        st.session_state.history = []
 
     # sidebar with information
     with st.sidebar:
@@ -49,8 +48,17 @@ def main():
         )
 
         st.header("🔧 Setup Status")
+        # initialize the RAG system lazily so importing this module doesn't block
         if rag_system is None:
-            st.error("❌ RAG system not initialized. Check API keys.")
+            try:
+                from query_rag import EldenRingRAG
+
+                rag_system = EldenRingRAG()
+                st.success("✅ RAG system ready!")
+            except Exception as e:
+                st.error("❌ RAG system not initialized. Check API keys.")
+                st.write(f"initialization error: {e}")
+                rag_system = None
         else:
             st.success("✅ RAG system ready!")
 
@@ -81,16 +89,37 @@ google_api_key=your_google_key_here
         return
 
     # question input
+    # show conversation history
+    if st.session_state.history:
+        st.markdown("### Conversation")
+        for turn in st.session_state.history:
+            st.markdown(f"**User:** {turn.get('user','')} ")
+            st.markdown(f"**Assistant:** {turn.get('assistant','')} ")
+            st.divider()
+
     question = st.text_input(
         "ask a question about elden ring lore:",
         value=st.session_state.get("question", ""),
         placeholder="e.g., who is the first demigod you encounter?",
     )
 
+    col1, col2 = st.columns([1, 4])
+    with col1:
+        if st.button("🔁 Clear conversation"):
+            st.session_state.history = []
+            st.session_state.question = ""
+            st.experimental_rerun()
+
     if st.button("🔍 Search Lore", type="primary") and question.strip():
         with st.spinner("searching ancient tomes..."):
             try:
-                answer, chunks = rag_system.answer_question(question.strip())
+                # pass conversation history to the rag system and receive updated history
+                answer, chunks, history = rag_system.answer_question(
+                    question.strip(), history=st.session_state.history
+                )
+
+                # update session history
+                st.session_state.history = history
 
                 # display answer
                 st.success("answer found!")

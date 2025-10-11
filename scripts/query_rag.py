@@ -7,6 +7,8 @@ build and run the rag pipeline for answering elden ring lore questions.
 
 import os
 from pathlib import Path
+from typing import List, Dict, Optional
+
 from sentence_transformers import SentenceTransformer
 from pinecone import Pinecone
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -41,10 +43,13 @@ class EldenRingRAG:
             max_tokens=1024,
         )
 
-        # set up the rag prompt template
+        # set up the rag prompt template (now supports conversation history)
         self.prompt_template = PromptTemplate(
-            input_variables=["context", "question"],
+            input_variables=["context", "history", "question"],
             template="""you are an expert on elden ring lore. use the following context from the elden ring wiki to answer the user's question accurately and helpfully.
+
+conversation history (most recent last):
+{history}
 
 context from elden ring wiki:
 {context}
@@ -52,14 +57,18 @@ context from elden ring wiki:
 question: {question}
 
 instructions:
-- answer based primarily on the provided context
+- answer based primarily on the provided context and relevant parts of the conversation history
 - be accurate and detailed but concise
 - if the context doesn't contain enough information, say so clearly
 - include relevant quotes from the context when helpful
+- when the user asks a follow-up question, use the conversation history to resolve references
 - maintain an engaging, helpful tone
 
 answer:""",
         )
+
+        # how many past turns to keep in the history when building the prompt
+        self.history_max_turns = 6
 
     def retrieve_relevant_chunks(self, query, top_k=5):
         """retrieve the most relevant text chunks for a query."""
@@ -94,7 +103,28 @@ answer:""",
 
         return "\n\n".join(context_parts)
 
-    def answer_question(self, question):
+    def format_history(self, history: Optional[List[Dict[str, str]]]) -> str:
+        """format a list of turns into a string for the prompt.
+
+        history is a list of dicts with keys: 'user' and 'assistant'.
+        the function keeps only the last `history_max_turns` turns.
+        """
+        if not history:
+            return "(no prior conversation)"
+
+        # keep only the last N turns
+        trimmed = history[-self.history_max_turns :]
+        parts = []
+        for turn in trimmed:
+            user_text = turn.get("user", "")
+            assistant_text = turn.get("assistant", "")
+            parts.append(f"User: {user_text}\nAssistant: {assistant_text}")
+
+        return "\n\n".join(parts)
+
+    def answer_question(
+        self, question: str, history: Optional[List[Dict[str, str]]] = None
+    ):
         """answer a question using the rag pipeline."""
         print(f"[search] searching for: {question}")
 
@@ -103,14 +133,23 @@ answer:""",
         print(f"[books] found {len(chunks)} relevant chunks")
 
         if not chunks:
-            return "i couldn't find any relevant information in the elden ring wiki for this question."
+            answer_text = "i couldn't find any relevant information in the elden ring wiki for this question."
+            if history is None:
+                history = []
+            history.append({"user": question, "assistant": answer_text})
+            return answer_text, chunks, history
 
-        # format context
+        # format context and conversation history
         context = self.format_context(chunks)
+        history_str = self.format_history(history)
 
         # create the chain
         chain = (
-            {"context": lambda x: context, "question": RunnablePassthrough()}
+            {
+                "context": lambda x: context,
+                "history": lambda x: history_str,
+                "question": RunnablePassthrough(),
+            }
             | self.prompt_template
             | self.llm
             | StrOutputParser()
@@ -120,34 +159,51 @@ answer:""",
         print("[ai] generating answer...")
         answer = chain.invoke(question)
 
-        return answer, chunks
+        # ensure history list exists and append this turn
+        if history is None:
+            history = []
+
+        history.append({"user": question, "assistant": answer})
+
+        return answer, chunks, history
 
 
 def main():
-    # example usage
     rag = EldenRingRAG()
 
-    # test questions
-    test_questions = [
-        "who is queen marika?",
-        "what are the different types of damage in elden ring?",
-        "how do i get to the mountaintops of the giants?",
-        "what are the requirements for becoming the elden lord?",
-    ]
+    print("[sword] elden ring lore assistant (multi-turn)")
+    print("type 'exit' or 'quit' to leave, 'clear' to reset conversation history")
+    print("=" * 60)
 
-    print("[sword] elden ring lore assistant")
-    print("=" * 50)
+    history: List[Dict[str, str]] = []
 
-    for question in test_questions:
-        print(f"\n[q] {question}")
+    while True:
         try:
-            answer, chunks = rag.answer_question(question)
-            print(f"[answer] {answer}")
+            question = input("\n[q] ").strip()
+        except (EOFError, KeyboardInterrupt):
+            print("\nexiting...")
+            break
+
+        if not question:
+            continue
+
+        if question.lower() in ("exit", "quit"):
+            print("goodbye")
+            break
+
+        if question.lower() == "clear":
+            history = []
+            print("conversation history cleared")
+            continue
+
+        try:
+            answer, chunks, history = rag.answer_question(question, history=history)
+            print(f"\n[answer] {answer}\n")
             print(f"[pages] sources: {len(chunks)} chunks")
         except Exception as e:
             print(f"[error] error: {e}")
 
-        print("-" * 50)
+        print("-" * 60)
 
 
 if __name__ == "__main__":
